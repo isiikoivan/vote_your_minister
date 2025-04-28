@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Candidate;
 use app\models\CandidateSearch;
+use components\GenHelperTrait;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -13,6 +14,7 @@ use yii\filters\VerbFilter;
  */
 class CandidateController extends Controller
 {
+    use GenHelperTrait;
     /**
      * @inheritDoc
      */

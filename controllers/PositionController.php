@@ -4,6 +4,7 @@ namespace app\controllers;
 
 use app\models\Position;
 use app\models\PositionSearch;
+use components\GenHelperTrait;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -13,6 +14,7 @@ use yii\filters\VerbFilter;
  */
 class PositionController extends Controller
 {
+//    use GenHelperTrait;
     /**
      * @inheritDoc
      */
@@ -38,12 +40,16 @@ class PositionController extends Controller
      */
     public function actionIndex()
     {
+        $model = new Position();
         $searchModel = new PositionSearch();
         $dataProvider = $searchModel->search($this->request->queryParams);
+//        $header = $this->renderSearchAndExportSection($searchModel);
 
         return $this->render('index', [
             'searchModel' => $searchModel,
             'dataProvider' => $dataProvider,
+'model' => $model,
+//            'header' => $header,
         ]);
     }
 
@@ -73,7 +79,8 @@ class PositionController extends Controller
             if ($model->load($this->request->post()) && $model->save()) {
                 return $this->redirect(['view', 'id' => $model->id]);
             }
-        } else {
+        }
+        else {
             $model->loadDefaultValues();
         }
 

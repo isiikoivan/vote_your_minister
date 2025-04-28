@@ -52,5 +52,10 @@ class Position extends \yii\db\ActiveRecord
             'created_at' => Yii::t('app', 'Created At'),
         ];
     }
+    public function TableColumns()
+    {
+        return [];
+        // TODO: Implement TableColumns() method.
+    }
 
 }

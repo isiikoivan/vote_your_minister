@@ -6,6 +6,10 @@ use yii\helpers\Url;
 use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
+use app\widgets\SearchExportWidget;
+use app\widgets\TableGeneratorWidget;
+
+
 /** @var yii\web\View $this */
 /** @var app\models\PositionSearch $searchModel */
 /** @var yii\data\ActiveDataProvider $dataProvider */
@@ -46,5 +50,27 @@ $this->title = Yii::t('app', 'Candidate Position');
     ]); ?>
 
     <?php Pjax::end(); ?>
+
+
+    <?= SearchExportWidget::widget([
+    'model' => $searchModel,
+    'searchFields' => [
+    ['name' => 'name', 'type' => 'text', 'placeholder' => 'Enter name'],
+    ['name' => 'created_at', 'type' => 'date', 'placeholder' => 'Select date'],
+//    ['name' => 'status', 'type' => 'select', 'placeholder' => 'Select status', 'options' => ['Active' => 'Active', 'Inactive' => 'Inactive']],
+    ],
+    'exportModel' => $searchModel,
+    'path' => 'controller/create',
+    'buttonText' => 'Add New',
+    'title' => 'Search and Export',
+    ])?>
+
+
+    <?= TableGeneratorWidget::widget([
+    'model' => $model,
+    'data' => null,
+    'provider' => $dataProvider,
+    ]);?>
+
 
 </div>

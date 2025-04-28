@@ -70,4 +70,25 @@ class PositionSearch extends Position
 
         return $dataProvider;
     }
+
+    public function getData()
+    {
+        // TODO: Implement getData() method.
+    }
+
+    public function exportColumns()
+    {
+        // TODO: Implement exportColumns() method.
+    }
+
+    public function searchFields()
+    {
+        // TODO: Implement searchFields() method.
+    }
+
+    public function TableColumns()
+    {
+        return [];
+        // TODO: Implement TableColumns() method.
+    }
 }

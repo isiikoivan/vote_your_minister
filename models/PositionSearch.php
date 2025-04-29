@@ -73,12 +73,25 @@ class PositionSearch extends Position
 
     public function getData()
     {
+        return $this->find()->asArray()->all();
         // TODO: Implement getData() method.
     }
 
     public function exportColumns()
     {
-        // TODO: Implement exportColumns() method.
+        return [
+            'description'=>'Description',
+            'created_by'=>[
+            'label'=>'Created By',
+            'format'=>function($model){
+                return User::findOne($model)->firstname ?? '(not found)';
+            }
+        ], 'created_at'=>[
+            'label'=>'Created At', 'format'=>function($model){
+            return date('d-m-Y', $model);
+            }
+        ]
+        ];
     }
 
     public function searchFields()
@@ -86,9 +99,11 @@ class PositionSearch extends Position
         // TODO: Implement searchFields() method.
     }
 
-    public function TableColumns()
+    public function tableColumns()
     {
-        return [];
-        // TODO: Implement TableColumns() method.
+        return ['name'=>'Name', 'description'=>'Description', 'created_by'=>'Created by', 'created_at'=>['label'=>'Created at',
+            'format'=>function($model){
+            return  $model ? date('d-m-Y', $model->created_at) : '(not set)';
+            }]];
     }
 }

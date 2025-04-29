@@ -1,36 +1,38 @@
-<?php 
-namespace components;
+<?php
+
+namespace app\components;
 
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use yii\base\Component;
+use PhpOffice\PhpSpreadsheet\Style\Fill;
 
-class ExportHelper extends Component{
+class ExportHelper extends Component
+{
+
     public static function exportExcel($models, $filename = 'export')
     {
         $columns = is_array($models) ? $models[0]->exportColumns() : $models->exportColumns();
         $data = is_array($models) ? $models[0]->getData() : $models->getData();
-        
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
-        
         self::setHeaders($sheet, $columns);
         self::setData($sheet, $data, $columns);
         self::styleHeader($sheet, self::getLastColumn($columns));
         self::outputFile($spreadsheet, $filename);
     }
-    
+
     private static function setHeaders($sheet, $columns)
     {
         $col = 'A';
         foreach ($columns as $field => $config) {
-            $header = is_array($config) ? $config['header'] : $config;
+            $header = is_array($config) ? $config['label'] : $config;
             $sheet->setCellValue($col . '1', $header);
             $sheet->getColumnDimension($col)->setAutoSize(true);
             $col++;
         }
     }
-    
+
     private static function setData($sheet, $data, $columns)
     {
         $row = 2;
@@ -44,7 +46,7 @@ class ExportHelper extends Component{
             $row++;
         }
     }
-    
+
     private static function getFieldValue($model, $field, $config)
     {
         if (is_array($config) && isset($config['value'])) {
@@ -53,7 +55,6 @@ class ExportHelper extends Component{
             $fieldValue = is_array($model) ? $model[$field] : $model->$field;
             $value = is_callable($field) ? $field($model) : $fieldValue;
         }
-        
         if (is_array($config) && isset($config['format'])) {
             if (is_callable($config['format'])) {
                 $value = $config['format']($value);
@@ -61,26 +62,25 @@ class ExportHelper extends Component{
                 $value = sprintf($config['format'], $value);
             }
         }
-        
         return $value;
     }
-    
+
     private static function styleHeader($sheet, $lastColumn)
     {
         $sheet->getStyle('A1:' . $lastColumn . '1')->applyFromArray([
             'font' => ['bold' => true],
             'fill' => [
-                'fillType' => \PhpOffice\PhpSpreadsheet\Style\Fill::FILL_SOLID,
+                'fillType' => Fill::FILL_SOLID,
                 'startColor' => ['rgb' => 'E2E2E2']
             ]
         ]);
     }
-    
+
     private static function getLastColumn($columns)
     {
         return chr(ord('A') + count($columns) - 1);
     }
-    
+
     private static function outputFile($spreadsheet, $filename)
     {
         $writer = new Xlsx($spreadsheet);
@@ -90,5 +90,6 @@ class ExportHelper extends Component{
         $writer->save('php://output');
         exit();
     }
+
 
 }

@@ -7,7 +7,7 @@ use yii\grid\ActionColumn;
 use yii\grid\GridView;
 use yii\widgets\Pjax;
 use app\widgets\SearchExportWidget;
-use app\widgets\TableGeneratorWidget;
+
 
 
 /** @var yii\web\View $this */
@@ -65,12 +65,19 @@ $this->title = Yii::t('app', 'Candidate Position');
     'title' => 'Search and Export',
     ])?>
 
+    <?= \app\widgets\FlashMessage::widget([
+        'useDismiss' => true,
+        'autoFade' => true,
+        'fadeTimeout' => 4000
+    ]); ?>
 
-    <?= TableGeneratorWidget::widget([
-    'model' => $model,
-    'data' => null,
-    'provider' => $dataProvider,
-    ]);?>
+<!--    --><?php //= TableGeneratorWidget::widget([
+//    'model' => $searchModel,
+//    'data' => null,
+//    'provider' => $dataProvider,
+//    ]);?>
+
+    <?=\app\widgets\TableGenerator::table(model:$searchModel, data_in: $dataProvider->getModels())?>
 
 
 </div>

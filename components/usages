@@ -554,3 +554,291 @@ class TableGenerator extends Component
         echo $html;
     }
 }
+
+
+ return $this->render('index',  [
+            'dataProvider' => $dataProvider,
+            'searchFields' => $searchModel->searchFields(),
+            'export_model'=>$searchModel,
+            'render_header'=>$this->renderSearchAndExportSection($searchModel,$searchModel->searchFields(),$searchModel,"create","New Course","Course Unit"),
+        ]);
+
+
+
+
+
+✅ Generalized FlashMessage Widget
+widgets/FlashMessage.php
+
+namespace app\widgets;
+
+use yii\base\Widget;
+use yii\bootstrap5\Alert;
+
+class FlashMessage extends Widget
+{
+    // Options to customize behavior
+    public $useDismiss = true;      // Whether to include a dismiss button
+    public $autoFade = false;       // Whether to auto-fade the alert after a timeout
+    public $fadeTimeout = 3000;     // Timeout in milliseconds for auto-fade
+    public $alertTypes = ['success', 'danger', 'info', 'warning', 'secondary', 'primary', 'light', 'dark']; // Alert types supported by Bootstrap
+
+    public function run()
+    {
+        $html = '';
+        $flashes = \Yii::$app->session->getAllFlashes();
+
+        // Loop through all the flash messages
+        foreach ($flashes as $type => $messages) {
+            $messages = (array)$messages;
+
+            foreach ($messages as $message) {
+                // Determine the Bootstrap alert class based on the flash type
+                $alertClass = $this->getAlertClass($type);
+
+                // Prepare the options for the alert widget
+                $options = [
+                    'class' => 'alert ' . $alertClass,
+                ];
+
+                // If we want a dismiss button, add relevant classes and attributes
+                if ($this->useDismiss) {
+                    $options['class'] .= ' alert-dismissible fade show';
+                    $options['role'] = 'alert';
+                }
+
+                // Render the alert widget
+                $html .= Alert::widget([
+                    'body' => $message,
+                    'options' => $options,
+                    'closeButton' => $this->useDismiss
+                        ? ['class' => 'btn-close', 'data-bs-dismiss' => 'alert', 'aria-label' => 'Close']
+                        : false,
+                ]);
+            }
+        }
+
+        // If auto-fade is enabled, add JavaScript for fading alerts
+        if ($this->autoFade) {
+            $html .= "<script>
+                setTimeout(function () {
+                    $('.alert').fadeOut('slow');
+                }, {$this->fadeTimeout});
+            </script>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Returns the correct Bootstrap alert class based on the message type.
+     *
+     * @param string $type Flash message type
+     * @return string Bootstrap alert class
+     */
+    protected function getAlertClass($type)
+    {
+        // Map the flash message type to a Bootstrap alert class
+        switch ($type) {
+            case 'success':    return 'alert-success';
+            case 'danger':     return 'alert-danger';
+            case 'info':       return 'alert-info';
+            case 'warning':    return 'alert-warning';
+            case 'secondary':  return 'alert-secondary';
+            case 'primary':    return 'alert-primary';
+            case 'light':      return 'alert-light';
+            case 'dark':       return 'alert-dark';
+            default:           return 'alert-warning'; // Default to warning if no type matches
+        }
+    }
+}
+
+✅ Usage Example
+
+In your view or layout, you can use the widget like this:
+Basic Usage (simple flash message display):
+
+<?= \app\widgets\FlashMessage::widget(); ?>
+
+Usage with Dismiss Button:
+
+<?= \app\widgets\FlashMessage::widget(['useDismiss' => true]); ?>
+
+Usage with Auto-Fade Out:
+
+<?= \app\widgets\FlashMessage::widget([
+    'autoFade' => true,
+    'fadeTimeout' => 4000,  // Auto fade after 4 seconds
+]); ?>
+
+Usage with All Options:
+
+<?= \app\widgets\FlashMessage::widget([
+    'useDismiss' => true,
+    'autoFade' => true,
+    'fadeTimeout' => 5000,  // Auto fade after 5 seconds
+]); ?>
+
+✅ Features Covered:
+
+    Basic Flash Messages:
+
+        It will display flash messages based on the session's getAllFlashes().
+
+    With Dismiss Button:
+
+        If useDismiss is set to true, each alert will have a dismiss button that users can click to close the message.
+
+    Auto-Fade Timeout:
+
+        If autoFade is enabled, all alerts will automatically fade out after the specified fadeTimeout.
+
+    Alert Types Mapping:
+
+        The widget supports all standard Bootstrap alert types (success, danger, info, warning, etc.) and defaults to alert-warning if the type is not found in the session.
+
+This generalized widget gives you flexibility and reusability. You can use it in various places across your app and control its behavior (e.g., whether it has a dismiss button, whether it fades out after a timeout).
+
+Let me know if you need further tweaks or a more specific configuration!
+You said:
+alerttype usage
+ChatGPT said:
+
+Ah, I see you're asking for clarification on how to use the alertTypes property in the widget. This property is intended to control which types of alert messages (success, danger, info, etc.) you want to display, or perhaps to restrict what types of flash messages are shown.
+
+Here’s an enhanced explanation and usage of alertTypes in the widget.
+Explanation of alertTypes
+
+The alertTypes property is an array that allows you to specify which types of alerts you want to render. In the FlashMessage widget, this property is meant to filter out unwanted types, so if you only want to display success and info messages, for example, you can set this property like this:
+
+'alertTypes' => ['success', 'info'],
+
+This allows you to control what types of alerts are shown, rather than showing all types of alerts from the session.
+Updated Widget to Include alertTypes Filtering
+
+Here’s an updated version of the widget that uses alertTypes to filter the types of flash messages being displayed.
+✅ Updated FlashMessage Widget with alertTypes Filtering
+widgets/FlashMessage.php
+
+namespace app\widgets;
+
+use yii\base\Widget;
+use yii\bootstrap5\Alert;
+
+class FlashMessage extends Widget
+{
+    // Options to customize behavior
+    public $useDismiss = true;      // Whether to include a dismiss button
+    public $autoFade = false;       // Whether to auto-fade the alert after a timeout
+    public $fadeTimeout = 3000;     // Timeout in milliseconds for auto-fade
+    public $alertTypes = ['success', 'danger', 'info', 'warning', 'secondary', 'primary', 'light', 'dark']; // Alert types supported by Bootstrap
+
+    public function run()
+    {
+        $html = '';
+        $flashes = \Yii::$app->session->getAllFlashes();
+
+        // Loop through all the flash messages
+        foreach ($flashes as $type => $messages) {
+            // Skip types that are not in the allowed alertTypes
+            if (!in_array($type, $this->alertTypes)) {
+                continue;
+            }
+
+            $messages = (array)$messages;
+
+            foreach ($messages as $message) {
+                // Determine the Bootstrap alert class based on the flash type
+                $alertClass = $this->getAlertClass($type);
+
+                // Prepare the options for the alert widget
+                $options = [
+                    'class' => 'alert ' . $alertClass,
+                ];
+
+                // If we want a dismiss button, add relevant classes and attributes
+                if ($this->useDismiss) {
+                    $options['class'] .= ' alert-dismissible fade show';
+                    $options['role'] = 'alert';
+                }
+
+                // Render the alert widget
+                $html .= Alert::widget([
+                    'body' => $message,
+                    'options' => $options,
+                    'closeButton' => $this->useDismiss
+                        ? ['class' => 'btn-close', 'data-bs-dismiss' => 'alert', 'aria-label' => 'Close']
+                        : false,
+                ]);
+            }
+        }
+
+        // If auto-fade is enabled, add JavaScript for fading alerts
+        if ($this->autoFade) {
+            $html .= "<script>
+                setTimeout(function () {
+                    $('.alert').fadeOut('slow');
+                }, {$this->fadeTimeout});
+            </script>";
+        }
+
+        return $html;
+    }
+
+    /**
+     * Returns the correct Bootstrap alert class based on the message type.
+     *
+     * @param string $type Flash message type
+     * @return string Bootstrap alert class
+     */
+    protected function getAlertClass($type)
+    {
+        // Map the flash message type to a Bootstrap alert class
+        switch ($type) {
+            case 'success':    return 'alert-success';
+            case 'danger':     return 'alert-danger';
+            case 'info':       return 'alert-info';
+            case 'warning':    return 'alert-warning';
+            case 'secondary':  return 'alert-secondary';
+            case 'primary':    return 'alert-primary';
+            case 'light':      return 'alert-light';
+            case 'dark':       return 'alert-dark';
+            default:           return 'alert-warning'; // Default to warning if no type matches
+        }
+    }
+}
+
+✅ How to Use the alertTypes Property
+
+When you use this widget, you can specify the types of messages you want to display by setting the alertTypes property.
+Example 1: Display Only success and info Messages
+
+If you only want to display success and info messages (ignoring others like danger, warning, etc.), you can set the alertTypes property like this:
+
+<?= \app\widgets\FlashMessage::widget([
+    'alertTypes' => ['success', 'info'],
+    'useDismiss' => true,  // Optional: Include dismiss button
+    'autoFade' => true,    // Optional: Enable auto fade after a timeout
+    'fadeTimeout' => 5000, // Optional: Auto fade timeout
+]); ?>
+
+Example 2: Display All Alert Types (Default Behavior)
+
+By default, the alertTypes array includes all alert types (success, danger, info, etc.). So if you don’t specify the alertTypes property, it will show all types of flash messages from the session.
+
+<?= \app\widgets\FlashMessage::widget([
+    'useDismiss' => true,  // Include dismiss button
+    'autoFade' => true,    // Enable auto fade
+    'fadeTimeout' => 4000, // Auto fade timeout
+]); ?>
+
+Example 3: Display Only warning and danger Messages
+
+If you only want to show warning and danger messages, you can specify them like this:
+
+<?= \app\widgets\FlashMessage::widget([
+    'alertTypes' => ['warning', 'danger'], // Only display 'warning' and 'danger'
+    'useDismiss' => true,                  // Include dismiss button
+    'autoFade' => true,                    // Enable auto fade
+    'fadeTimeout' => 3000,                 // Auto fade timeout
+]); ?>

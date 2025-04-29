@@ -1,10 +1,10 @@
 <?php
-
 namespace app\controllers;
 
+use app\components\ExcelPdfGenerator;
+use app\components\ExportHelper;
 use app\models\Position;
 use app\models\PositionSearch;
-use components\GenHelperTrait;
 use yii\web\Controller;
 use yii\web\NotFoundHttpException;
 use yii\filters\VerbFilter;
@@ -50,6 +50,8 @@ class PositionController extends Controller
             'dataProvider' => $dataProvider,
 'model' => $model,
 //            'header' => $header,
+            'searchFields' => $searchModel->searchFields(),
+            'export_model'=>$searchModel,
         ]);
     }
 
@@ -137,5 +139,33 @@ class PositionController extends Controller
         }
 
         throw new NotFoundHttpException(Yii::t('app', 'The requested page does not exist.'));
+    }
+
+    public function actionPdfExport()
+    {
+        $modelName = \Yii::$app->request->get('model');
+        if (!empty($modelName)) {
+            $modelClass = $modelName;
+            if (class_exists($modelClass)) {
+                $model = new $modelClass();
+                ExcelPdfGenerator::generatePdf($model, \app\widgets\CrossHelperCopy::modelNameResolver($model));
+            }
+        }
+        return $this->redirect(\Yii::$app->request->referrer);
+    }
+
+    public function actionExcelExport()
+    {
+        $modelName = \Yii::$app->request->get('model');
+        if (!empty($modelName)) {
+            $modelClass = $modelName;
+            if (class_exists($modelClass)) {
+
+                $model = new $modelClass();
+
+                ExportHelper::exportExcel($model);
+            }
+        }
+        return $this->redirect(\Yii::$app->request->referrer);
     }
 }

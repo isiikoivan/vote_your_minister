@@ -27,6 +27,8 @@ class TableGeneratorWidget extends Widget
         $hasActions = false;
         $actionColumn = null;
 
+
+
         foreach ($attributes as $key => $headerInfo) {
             if (is_array($headerInfo) && isset($headerInfo['actions'])) {
                 $hasActions = true;
@@ -48,7 +50,7 @@ class TableGeneratorWidget extends Widget
                 <tr>
                     <th>No</th>
                     <?php foreach ($attributes as $key => $headerInfo): ?>
-                        <th><?= Html::encode(is_array($headerInfo) ? $headerInfo['label'] : $headerInfo) ?></th>
+                        <th ><?= Html::encode(is_array($headerInfo) ? $headerInfo['label'] : $headerInfo) ?></th>
                     <?php endforeach; ?>
                     <?php if ($hasActions): ?>
                         <th>Actions</th>
@@ -68,6 +70,7 @@ class TableGeneratorWidget extends Widget
                                 } else {
                                     $rawKeys = ['is_active', 'locked', 'active', 'status', 'archived'];
                                     echo in_array($key, $rawKeys) ? $row[$key] : Html::encode($row[$key]);
+//                                    echo  Html::encode($row[$key]);
                                 }
                                 ?>
                             </td>

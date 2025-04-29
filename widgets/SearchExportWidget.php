@@ -7,9 +7,6 @@ use yii\base\Widget;
 use yii\helpers\Html;
 use yii\helpers\Url;
 use yii\widgets\ActiveForm;
-use app\components\SearchableDropDown;
-use app\helpers\CrossHelperCopy;
-use app\helpers\ExcelPdfGenerator;
 
 class SearchExportWidget extends Widget
 {
@@ -130,4 +127,6 @@ class SearchExportWidget extends Widget
         }
         return is_object($object) ? get_class($object) : '';
     }
+
+
 }
